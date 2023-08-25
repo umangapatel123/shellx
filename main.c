@@ -54,14 +54,13 @@ void handle_background_exit()
 
 void setSignal()
 {
-    // signal(SIGINT, SIG_IGN);
-    // signal(SIGTSTP, SIG_IGN);
+    signal(SIGINT, SIG_IGN);
+    signal(SIGTSTP, SIG_IGN);
     signal(SIGCHLD, handle_background_exit);
 }
 
 void execute_command(char *input, char *permenant_home)
 {
-    setSignal();
     char dup[4096];
     strcpy(dup, input);
     char dup2[4096];
@@ -249,6 +248,7 @@ int main()
     char *permenant_home = malloc(MAX_PATH_LEN * sizeof(char));
     getcwd(permenant_home, MAX_PATH_LEN);
     // Keep accepting commands
+    setSignal();
     while (1)
     {
         // Print appropriate prompt with username, systemname and directory before accepting input
