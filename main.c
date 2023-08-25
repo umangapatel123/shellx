@@ -5,7 +5,37 @@ bool temp_flag = false;
 bool ProcessPrintStatus = false;
 char *ProcessPrintStatusString = NULL;
 
+extern bool PasteventsExecuteFlag;
+extern char *PasteventsExecuteString;
+
 extern BgProcess bgProcessHead;
+
+char *argumentsChange(char *input)
+{
+    char *temp=(char *)malloc(sizeof(char)*MAX_COMMAND_LENGTH);
+    strcpy(temp,input);
+    char *token=strtok(temp,"&;");
+    char *temp2=(char *)malloc(sizeof(char)*MAX_COMMAND_LENGTH);
+    strcpy(temp2,token);    
+    while(token!=NULL)
+    {
+        token=strtok(NULL,"&;");
+        if(token==NULL)
+        {
+            break;
+        }
+        if(strstr(token,"pastevents")!=NULL && strstr(token,"execute")!=NULL)
+        {
+            continue;
+        }
+        strcat(temp2," ; ");
+        strcat(temp2,token);
+    }
+    strcat(temp2," ; ");
+    strcat(temp2,PasteventsExecuteString);
+    strcat(temp2,"\0");
+    return temp2;
+}
 
 void handle_background_exit()
 {
@@ -67,6 +97,7 @@ void execute_command(char *input, char *permenant_home)
     strcpy(dup2, input);
     char *token1 = strtok(dup2, ";");
     char **args = malloc(MAX_PATH_LEN * sizeof(char *));
+    char **tempargsForPastevents=malloc(MAX_PATH_LEN * sizeof(char *));
     int i = 0;
     while (token1 != NULL)
     {
@@ -148,6 +179,7 @@ void execute_command(char *input, char *permenant_home)
                 i++;
             }
             args[i] = NULL;
+            tempargsForPastevents=args;
             pastevents(args, permenant_home);
             flag = flag && temp_flag;
             continue;
@@ -236,8 +268,21 @@ void execute_command(char *input, char *permenant_home)
     // {
     if (strstr(dup, "pastevents") == NULL && ct != 0)
     {
+        // printf("here\n");
         mainToAddHistory(dup, permenant_home);
     }
+    // if (strstr(dup, "pastevents") != NULL && strstr(dup, "execute") != NULL && !PasteventsExecuteFlag && PasteventsExecuteString != NULL)
+    // {
+    //     char *PasteventsExecuteChangedString=argumentsChange(input);
+    //     // printf("%s\n",PasteventsExecuteChangedString);
+    //     mainToAddHistory(PasteventsExecuteChangedString, permenant_home);
+
+    //     PasteventsExecuteFlag = false;
+    //     PasteventsExecuteString = NULL;
+
+    // }
+    // PasteventsExecuteFlag = false;
+    // PasteventsExecuteString = NULL;
     // }
     flag = true;
     free(args);

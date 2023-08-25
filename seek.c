@@ -21,6 +21,18 @@ char *string_cut_new(char *str, int start, int end)
     return temp;
 }
 
+bool CompareFiles(char *a ,char *b)
+{
+    int len1=strlen(a);
+    int len2=strlen(b);
+    for(int i=0;i<len1;i++)
+    {
+        if(a[i]!=b[i])
+            return false;
+    }
+    return true;
+}
+
 void seek_serach(char *target, char *target_directory, int flags)
 {
     if (strcmp(target, ".") == 0 || strcmp(target, "..") == 0)
@@ -48,22 +60,8 @@ void seek_serach(char *target, char *target_directory, int flags)
             perror("stat");
         }
         char *token = NULL;
-        if (!S_ISDIR(file_stat_temp.st_mode))
-        {
-            // remove extension
-            char *temp = malloc(MAX_PATH_LEN * sizeof(char));
-            strcpy(temp, dp->d_name);
-            token = strtok(temp, ".");
-            if (token == NULL)
-            {
-                token = dp->d_name;
-            }
-        }
-        else
-        {
-            token = dp->d_name;
-        }
-        if (strcmp(target, token) == 0)
+
+        if (CompareFiles(target, dp->d_name))
         {
 
             char *path_file = malloc(MAX_PATH_LEN * sizeof(char));

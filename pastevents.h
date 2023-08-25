@@ -23,5 +23,6 @@ typedef struct history* History;
 
 void pastevents(char **args, char *permenant_home);
 void mainToAddHistory(char *command_name, char *permenant_home);
+char *getCommandPathReplace(char **args, char *permenant_home);
 
 #endif
