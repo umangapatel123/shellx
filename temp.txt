@@ -1,0 +1,91 @@
+char *token = strtok(dup, " \t\n");
+        // If no command is given, continue
+        if (token == NULL)
+        {
+            continue;
+        }
+        // If command is exit, exit
+        if (strcmp(token, "exit") == 0)
+        {
+            exit(0);
+        }
+        // If command is warp, change directory
+        if (strcmp(token, "warp") == 0)
+        {
+            int ct=0;
+            while (token != NULL)
+            {
+                token = strtok(NULL, " \t\n");
+                if (token == NULL)
+                {
+                    if(ct==0)
+                    {
+                        warp(NULL, permenant_home, &previous_directory, input);
+                    }
+                    break;
+                }
+                warp(token, permenant_home, &previous_directory, input);
+                ct++;
+            }
+            continue;
+        }
+
+        // If command is peek, list files in directory
+        if (strcmp(token, "peek") == 0)
+        {
+            char **args = malloc(MAX_PATH_LEN * sizeof(char *));
+            int i = 0;
+            while (token != NULL)
+            {
+                token = strtok(NULL, " \t\n");
+                if (token == NULL)
+                {
+                    break;
+                }
+                args[i] = token;
+                i++;
+            }
+            args[i] = NULL;
+            peek(args, permenant_home,dup);
+            continue;
+        }
+
+        // If command is pastevents, list past events
+        if (strcmp(token, "pastevents") == 0)
+        {
+            char **args = malloc(MAX_PATH_LEN * sizeof(char *));
+            int i = 0;
+            while (token != NULL)
+            {
+                token = strtok(NULL, " \t\n");
+                if (token == NULL)
+                {
+                    break;
+                }
+                args[i] = token;
+                i++;
+            }
+            args[i] = NULL;
+            pastevents(args, permenant_home);
+            continue;
+        }
+
+        // If command is proclore, list processes
+        if (strcmp(token, "proclore") == 0)
+        {
+            char **args = malloc(MAX_PATH_LEN * sizeof(char *));
+            int i = 0;
+            while (token != NULL)
+            {
+                token = strtok(NULL, " \t\n");
+                if (token == NULL)
+                {
+                    break;
+                }
+                args[i] = token;
+                i++;
+            }
+            args[i] = NULL;
+            proclore(args, permenant_home);
+            continue;
+        }

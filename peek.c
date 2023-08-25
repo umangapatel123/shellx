@@ -1,5 +1,6 @@
 #include "peek.h"
 #include "headers.h"
+extern bool temp_flag;
 
 struct FileEntry
 {
@@ -30,6 +31,7 @@ int make_files(char *path, FileEntry **files)
     DIR *dir = opendir(path);
     if (dir == NULL)
     {
+        temp_flag = false;
         perror("Error");
         return -1;
     }
@@ -43,12 +45,17 @@ int make_files(char *path, FileEntry **files)
         }
         FileEntry file;
         strcpy(file.name, entry->d_name);
-
-        if (stat(file.name, &file.stats) == -1)
+        char *temp_path=(char *)malloc(sizeof(char)*MAX_PATH_LEN);
+        strcpy(temp_path,path);
+        strcat(temp_path,"/");
+        strcat(temp_path,file.name);    
+        if (stat(temp_path, &file.stats) == -1)
         {
+            temp_flag = false;
             perror("Error");
             return -1;
         }
+        free(temp_path);
         *files = realloc(*files, sizeof(struct FileEntry) * (i + 1));
         (*files)[i] = file;
         i++;
@@ -63,6 +70,7 @@ int make_list_hidden(char *path, FileEntry **files)
     DIR *dir = opendir(path);
     if (dir == NULL)
     {
+        temp_flag = false;
         perror("Error");
         return -1;
     }
@@ -72,12 +80,18 @@ int make_list_hidden(char *path, FileEntry **files)
     {
         FileEntry file;
         strcpy(file.name, entry->d_name);
+        char *temp_path=(char *)malloc(sizeof(char)*MAX_PATH_LEN);
+        strcpy(temp_path,path);
+        strcat(temp_path,"/");
+        strcat(temp_path,file.name);
 
-        if (stat(file.name, &file.stats) == -1)
+        if (stat(temp_path, &file.stats) == -1)
         {
+            temp_flag = false;
             perror("Error");
             return -1;
         }
+        free(temp_path);
         *files = realloc(*files, sizeof(struct FileEntry) * (i + 1));
         (*files)[i] = file;
         i++;
@@ -151,7 +165,23 @@ void Print_List_With_L(FileEntry *files, int n)
     }
 }
 
-void peek(char **args)
+char* get_complete_path(char *path, char *permenant_home)
+{
+    char *complete_path = (char *)malloc(sizeof(char) * MAX_PATH_LEN);
+    if (path[0] == '~')
+    {
+        strcpy(complete_path, permenant_home);
+        strcat(complete_path, path + 1);
+    }
+    else
+    {
+        strcpy(complete_path, path);
+    }
+    complete_path[strlen(complete_path)] = '\0';
+    return complete_path;
+}
+
+void peek(char **args, char *permenant_home,char* command_name)
 {
     // If no directory is given, list files in current directory
     FileEntry *files = NULL;
@@ -159,10 +189,10 @@ void peek(char **args)
     {
         int i = make_files(".", &files);
         Print_List(files, i);
+        temp_flag = true;
         return;
     }
     // check if args[0] is a directory or flag
-    printf("%s\n", args[0]);
     if (strcmp(args[0], "-a") == 0 || strcmp(args[0], "-l") == 0 || strcmp(args[0], "-al") == 0 || strcmp(args[0], "-la") == 0)
     {
         if (args[1] == NULL)
@@ -171,37 +201,111 @@ void peek(char **args)
             {
                 int i = make_list_hidden(".", &files);
                 Print_List(files, i);
+                temp_flag = true;
                 return;
             }
             else if (strcmp(args[0], "-l") == 0)
             {
                 int i = make_files(".", &files);
                 Print_List_With_L(files, i);
+                temp_flag = true;
                 return;
             }
             else if (strcmp(args[0], "-al") == 0 || strcmp(args[0], "-la") == 0)
             {
                 int i = make_list_hidden(".", &files);
                 Print_List_With_L(files, i);
+                temp_flag = true;
                 return;
             }
         }
         else
         {
-            DIR *dir = opendir(args[1]);
-            if (dir == NULL)
+            if (strcmp(args[0], "-a") == 0)
             {
-                perror("Error");
-                return;
+                if(strcmp(args[1], "-l") == 0)
+                {
+                    if(args[2] == NULL)
+                    {
+                        int i = make_list_hidden(".", &files);
+                        Print_List_With_L(files, i);
+                        temp_flag = true;
+                        return;
+                    }
+                    else
+                    {
+                        char *complete_path = get_complete_path(args[2], permenant_home);
+                        int i = make_list_hidden(complete_path, &files);
+                        Print_List_With_L(files, i);
+                        temp_flag = true;
+                        return;
+                    }
+                }
+                else
+                {
+                    char *complete_path = get_complete_path(args[1], permenant_home);
+                    int i = make_list_hidden(complete_path, &files);
+                    Print_List(files, i);
+                    temp_flag = true;
+                    return;
+                }
             }
-            struct dirent *entry;
-            while ((entry = readdir(dir)) != NULL)
+            else if (strcmp(args[0], "-l") == 0)
             {
-                printf("%s\n", entry->d_name);
+                if(strcmp(args[1], "-a") == 0)
+                {
+                    if(args[2] == NULL)
+                    {
+                        int i = make_list_hidden(".", &files);
+                        Print_List_With_L(files, i);
+                        temp_flag = true;
+                        return;
+                    }
+                    else
+                    {
+                        char *complete_path = get_complete_path(args[2], permenant_home);
+                        int i = make_list_hidden(complete_path, &files);
+                        Print_List_With_L(files, i);
+                        temp_flag = true;
+                        return;
+                    }
+                }
+                else
+                {
+                    char *complete_path = get_complete_path(args[1], permenant_home);
+                    int i = make_files(complete_path, &files);
+                    Print_List_With_L(files, i);
+                    temp_flag = true;
+                    return;
+                }
             }
-            closedir(dir);
-            return;
+            else if (strcmp(args[0], "-al") == 0 || strcmp(args[0], "-la") == 0)
+            {
+                if(args[1] == NULL)
+                {
+                    int i = make_list_hidden(".", &files);
+                    Print_List_With_L(files, i);
+                    temp_flag = true;
+                    return;
+                }
+                else
+                {
+                    char *complete_path = get_complete_path(args[1], permenant_home);
+                    int i = make_list_hidden(complete_path, &files);
+                    Print_List_With_L(files, i);
+                    temp_flag = true;
+                    return;
+                }
+            }
         }
+    }
+    else
+    {
+        char *complete_path = get_complete_path(args[0], permenant_home);
+        int i = make_files(complete_path, &files);
+        Print_List(files, i);
+        temp_flag = true;
+        return;
     }
     return;
 }

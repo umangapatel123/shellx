@@ -16,9 +16,21 @@
 #include <dirent.h>
 #include <grp.h>
 #include <time.h>
+#include <assert.h>
+#include <stdbool.h>
+#include <ctype.h>
 
 
 #include "prompt.h"
 #include "peek.h"
 #include "warp.h"
+#include "pastevents.h"
+#include "proclore.h"
+#include "seek.h"
+#include "system.h"
+
+
+
+
+void execute_command(char *input, char* permenant_home);
 #endif

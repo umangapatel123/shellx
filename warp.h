@@ -2,7 +2,7 @@
 #define WARP_H
 
 
-void warp(char *path, char *permenant_home, char **previous_directory);
+void warp(char *path, char *permenant_home, char **previous_directory,char *command_name);
 
 
 #endif

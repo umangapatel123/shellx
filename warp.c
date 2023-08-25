@@ -1,15 +1,15 @@
 #include "headers.h"
+extern bool temp_flag;
 
 // Function to change directory
-void warp(char *path, char *permenant_home, char **previous_directory)
+void warp(char *path, char *permenant_home, char **previous_directory,char *command_name)
 {
-    // If no path is given, go to home directory
+
     if (path == NULL)
     {
-        struct passwd *pw = getpwuid(getuid());
-        path = pw->pw_dir;
+        path = permenant_home;
     }
-    // If path is ~, go to home directory
+
     if (strcmp(path, "~") == 0)
     {
         path = permenant_home;
@@ -22,8 +22,6 @@ void warp(char *path, char *permenant_home, char **previous_directory)
         path = temp;
     }
 
-    // Change directory
-
     // If path is -, go to previous directory
     char *temp = malloc(MAX_PATH_LEN * sizeof(char));
     if (strcmp(path, "-") == 0)
@@ -31,6 +29,7 @@ void warp(char *path, char *permenant_home, char **previous_directory)
         if (*previous_directory == NULL)
         {
             printf("Error: OLDPWD not set\n");
+            temp_flag = false;
             return;
         }
         strcpy(temp, *previous_directory);
@@ -44,10 +43,12 @@ void warp(char *path, char *permenant_home, char **previous_directory)
     int ret = chdir(path);
     if (ret == -1)
     {
+        temp_flag = false;
         perror("Error");
     }
     else
     {
+        temp_flag = true;  
         printf("%s\n", getcwd(temp, MAX_PATH_LEN));
     }
     free(temp);
