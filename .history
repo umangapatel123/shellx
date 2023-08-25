@@ -1,3 +1,15 @@
+seek -d -f test
+seek -e -d newfolder ./doe
+make
+seek -e -d newfolder ./doe
 exit
-hi
+seek -e -d newfolder ./doe
+exit
+seek -e -d newfolder ./doe
+exit
+seek -e -d newfolder ./doe
+peek -al
+ls -al
+warp ../../Downloads
+warp
 exit

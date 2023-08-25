@@ -145,7 +145,7 @@ void Print_List_With_L(FileEntry *files, int n)
     {
         total += files[j].stats.st_blocks;
     }
-    printf("total %d\n", total / 2);
+    printf("total %d\n", total);
 
     for (int j = 0; j < n; j++)
     {

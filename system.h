@@ -2,7 +2,7 @@
 #define SYSTEM_H
 
 void system_command(char* command,char *permenant_home);
-void bgProcessStatus();
+
 
 // char *promptInclude=NULL;
 // bool promptIncludeFlag=false;

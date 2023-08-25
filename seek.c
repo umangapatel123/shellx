@@ -34,6 +34,7 @@ void seek_serach(char *target, char *target_directory, int flags)
     if ((dir = opendir(target_directory)) == NULL)
     {
         perror("opendir");
+        already_printed = true;
         return;
     }
     while ((dp = readdir(dir)) != NULL)
