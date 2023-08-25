@@ -1,5 +1,3 @@
-proclore hi
-proclore 100 500
 proclore 100
 proclore 500
 seek adada gfgf
@@ -13,3 +11,5 @@ seek -d -e newfolder
 seek -f -e newfolder
 seek -d doe
 seek -d -e doe
+peek -l
+ls -l

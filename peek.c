@@ -139,7 +139,14 @@ char* convert_permissions(mode_t mode)
 }
 
 void Print_List_With_L(FileEntry *files, int n)
-{
+{   
+    int total = 0;
+    for (int j = 0; j < n; j++)
+    {
+        total += files[j].stats.st_blocks;
+    }
+    printf("total %d\n", total / 2);
+
     for (int j = 0; j < n; j++)
     {
         char *permissions = convert_permissions(files[j].stats.st_mode);
