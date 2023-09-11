@@ -1,9 +1,12 @@
 #include "headers.h"
 char *previous_directory = NULL;
+bool fg_running = false;
 bool temp_flag = false;
+char *GlobalInput = NULL;
 
 bool ProcessPrintStatus = false;
 char *ProcessPrintStatusString = NULL;
+char *Home_Permenant=NULL;
 
 extern bool PasteventsExecuteFlag;
 extern char *PasteventsExecuteString;
@@ -84,7 +87,7 @@ void handle_background_exit()
 
 void setSignal()
 {
-    signal(SIGINT, SIG_IGN);
+    signal(SIGINT, key_handler);
     signal(SIGTSTP, SIG_IGN);
     signal(SIGCHLD, handle_background_exit);
 }
@@ -110,13 +113,28 @@ void execute_command(char *input, char *permenant_home)
     int ct = 0;
     for (int j = 0; j < i; j++)
     {
+        fg_running = true;
         temp_flag = false;
+        char *CopyForRedirect=(char *)malloc(sizeof(char)*MAX_COMMAND_LENGTH);
+        strcpy(CopyForRedirect,args[j]);
+        char *CopyForPipe=(char *)malloc(sizeof(char)*MAX_COMMAND_LENGTH);
+        strcpy(CopyForPipe,args[j]);
         char *token2 = strtok(args[j], " \t\n");
         if (token2 == NULL)
         {
             continue;
         }
         ct++;
+        if(isPiped(CopyForPipe))
+        {
+            pipeHandler(CopyForPipe, permenant_home);
+            continue;
+        }
+        if(isRedirect(CopyForRedirect))
+        {
+            Redirect(CopyForRedirect, permenant_home);
+            continue;
+        }
         if (strcmp(token2, "exit") == 0)
         {
             if (strstr(dup, "pastevents") == NULL)
@@ -222,6 +240,120 @@ void execute_command(char *input, char *permenant_home)
             flag = flag && temp_flag;
             continue;
         }
+        if (strcmp(token2, "iMan") == 0)
+        {
+            char **args = malloc(MAX_PATH_LEN * sizeof(char *));
+            int i = 0;
+            while (token2 != NULL)
+            {
+                token2 = strtok(NULL, " \t\n");
+                if (token2 == NULL)
+                {
+                    break;
+                }
+                args[i] = token2;
+                i++;
+            }
+            args[i] = NULL;
+            iMan(args, permenant_home);
+            flag = flag && temp_flag;
+            continue;
+        }   
+        if (strcmp(token2, "ping") == 0)
+        {
+            char **args = malloc(MAX_PATH_LEN * sizeof(char *));
+            int i = 0;
+            while (token2 != NULL)
+            {
+                token2 = strtok(NULL, " \t\n");
+                if (token2 == NULL)
+                {
+                    break;
+                }
+                args[i] = token2;
+                i++;
+            }
+            args[i] = NULL;
+            ping(args, permenant_home);
+            flag = flag && temp_flag;
+            continue;
+        }
+        if (strcmp(token2, "activities") == 0)
+        {
+            char **args = malloc(MAX_PATH_LEN * sizeof(char *));
+            int i = 0;
+            while (token2 != NULL)
+            {
+                token2 = strtok(NULL, " \t\n");
+                if (token2 == NULL)
+                {
+                    break;
+                }
+                args[i] = token2;
+                i++;
+            }
+            args[i] = NULL;
+            activities(args, permenant_home);
+            flag = flag && temp_flag;
+            continue;
+        }
+        if (strcmp(token2, "fg") == 0)
+        {
+            char **args = malloc(MAX_PATH_LEN * sizeof(char *));
+            int i = 0;
+            while (token2 != NULL)
+            {
+                token2 = strtok(NULL, " \t\n");
+                if (token2 == NULL)
+                {
+                    break;
+                }
+                args[i] = token2;
+                i++;
+            }
+            args[i] = NULL;
+            fg(args, permenant_home);
+            flag = flag && temp_flag;
+            continue;
+        }
+        if (strcmp(token2, "bg") == 0)
+        {
+            char **args = malloc(MAX_PATH_LEN * sizeof(char *));
+            int i = 0;
+            while (token2 != NULL)
+            {
+                token2 = strtok(NULL, " \t\n");
+                if (token2 == NULL)
+                {
+                    break;
+                }
+                args[i] = token2;
+                i++;
+            }
+            args[i] = NULL;
+            bg(args, permenant_home);
+            flag = flag && temp_flag;
+            continue;
+        }
+        if (strcmp(token2, "neonate") == 0)
+        {
+            char **args = malloc(MAX_PATH_LEN * sizeof(char *));
+            int i = 0;
+            while (token2!=NULL)
+            {
+                token2 = strtok(NULL, " \t\n");
+                if (token2 == NULL)
+                {
+                    break;
+                }
+                args[i]=token2;
+                i++;
+            }
+            args[i]=NULL;
+            neonate(args, permenant_home);
+            flag = flag && temp_flag;
+            continue;
+        }
         else
         {
             bool bg = false;
@@ -292,6 +424,7 @@ int main()
 {
     char *permenant_home = malloc(MAX_PATH_LEN * sizeof(char));
     getcwd(permenant_home, MAX_PATH_LEN);
+    Home_Permenant=permenant_home;
     // Keep accepting commands
     setSignal();
     while (1)
@@ -299,7 +432,13 @@ int main()
         // Print appropriate prompt with username, systemname and directory before accepting input
         prompt(permenant_home);
         char input[4096];
-        fgets(input, 4096, stdin);
+        char *line = fgets(input, 4096, stdin);
+        if(line==NULL)
+        {
+            printf("\n");
+            logout();
+        }
+        GlobalInput = input;
         if (ProcessPrintStatus)
         {
             printf("%s", ProcessPrintStatusString);
@@ -307,5 +446,6 @@ int main()
             ProcessPrintStatusString = NULL;
         }
         execute_command(input, permenant_home);
+        fg_running = false;
     }
 }

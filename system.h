@@ -16,4 +16,5 @@ struct bgProcess
 
 typedef struct bgProcess *BgProcess;
 
+void addToBgProcessList(BgProcess *head, pid_t pid, char *command);
 #endif

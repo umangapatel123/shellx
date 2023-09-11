@@ -19,6 +19,8 @@ void background_run(char *command,char **args)
     int pid = fork();
     if (pid == 0)
     {
+        signal(SIGINT, SIG_DFL);
+        signal(SIGTSTP, SIG_DFL);
         setpgid(0,0);
         if (execvp(args[0], args) == -1)
         {
@@ -41,6 +43,24 @@ void background_run(char *command,char **args)
         bgProcessHead = bgProcess;
         printf("%d\n", pid);
     }
+    return;
+}
+
+void addToBgProcessList(BgProcess *head, pid_t pid, char *command)
+{
+    BgProcess temp = (BgProcess)malloc(sizeof(struct bgProcess));
+    temp->pid = pid;
+    temp->command = (char *)malloc(sizeof(char) * MAX_COMMAND_LENGTH);
+    strcpy(temp->command, command);
+    temp->start = time(NULL);
+    temp->next = NULL;
+    if (*head == NULL)
+    {
+        *head = temp;
+        return;
+    }
+    temp->next = *head;
+    *head = temp;
     return;
 }
 
@@ -127,6 +147,9 @@ void foreground(char **args)
     int pid = fork();
     if (pid == 0)
     {
+        signal(SIGINT, SIG_DFL);
+        signal(SIGTSTP, SIG_DFL);
+        setpgid(0,0);
         if (execvp(args[0], args) == -1)
         {
             printf("\nError: '%s' is not a valid command\n", args[0]);
@@ -141,9 +164,15 @@ void foreground(char **args)
     else
     {
         int status;
+        signal(SIGTTIN, SIG_IGN);
+        signal(SIGTTOU, SIG_IGN);
+        tcsetpgrp(STDIN_FILENO, pid);
         time_t start = time(NULL);
         waitpid(pid, &status, WUNTRACED);
         time_t end = time(NULL);
+        tcsetpgrp(STDIN_FILENO, getpgrp());
+        signal(SIGTTOU, SIG_DFL);
+        signal(SIGTTIN, SIG_DFL);
         if(end - start >= 2)
         {
             char *temp=(char *)malloc(sizeof(char)*MAX_COMMAND_LENGTH);
@@ -165,6 +194,11 @@ void foreground(char **args)
                 PromptInclude=(char *)malloc(sizeof(char)*MAX_COMMAND_LENGTH);
                 strcpy(PromptInclude,temp);
             }
+        }
+        if (WIFSTOPPED(status))
+        {
+            addToBgProcessList(&bgProcessHead, pid, args[0]);
+            printf("\n%s with pid %d suspended\n", args[0], pid);
         }
     }
 }
