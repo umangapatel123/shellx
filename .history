@@ -1,15 +1,15 @@
-iMan cat
-iMan ls
-iMan sleep
-iMan open
-clear
-iMan open
-clear
-iMan invalid
-iMan mkdir
-iMan sleep
-iMan peek
-iMan freopen
-iMan ls
-clear
-iMan freopen
+ls -al grep ^d
+ls -al 
+ grep '^d'
+ls -al | grep '^d'
+ls 
+ w -l
+ls | w -l
+ls 
+ wc -l
+ls | wc -l
+ls -al 
+ grep '^d'
+ls -al | grep '^d'
+sleep 100
+fg 366551
