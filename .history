@@ -1,15 +1,15 @@
-ls -al grep ^d
-ls -al 
- grep '^d'
-ls -al | grep '^d'
-ls 
- w -l
-ls | w -l
-ls 
- wc -l
-ls | wc -l
-ls -al 
- grep '^d'
-ls -al | grep '^d'
-sleep 100
-fg 366551
+exit
+seek ..
+peek ..
+ls
+warp ..
+peek ..
+peek ../..
+warp 
+iMan ls
+iMan cd
+iMan sleep
+iMan __ppc_set_ppr_med_low
+[B
+iMan ber_get_bitstring
+[A

@@ -130,8 +130,9 @@ void iMan(char **args, char * permenant_home)
         response[bytes] = '\0';
         if ( strstr(response, "No matches for ") != NULL )
         {
-            printf("ERROR\n");
-            printf("        No such command found\n");
+            printf("\033[1;31mERROR\033[0m\n");
+            //give some color to this
+            printf("\033[1;31m         No such command found\033[0m\n");
             close(sockfd);
             return;
         }

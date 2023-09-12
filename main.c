@@ -141,7 +141,8 @@ void execute_command(char *input, char *permenant_home)
             {
                 mainToAddHistory(dup, permenant_home);
             }
-            exit(0);
+            logout();
+            // exit(0);
         }
         if (strcmp(token2, "warp") == 0)
         {
