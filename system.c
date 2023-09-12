@@ -235,7 +235,13 @@ void call_foreground(char **foregroundProcess,char *permenant_home)
         strstr(foregroundProcess[i],"peek")!=NULL ||
         strstr(foregroundProcess[i],"pastevents")!=NULL ||
         strstr(foregroundProcess[i],"proclore")!=NULL ||
-        strstr(foregroundProcess[i],"seek")!=NULL)
+        strstr(foregroundProcess[i],"seek")!=NULL ||
+        strstr(foregroundProcess[i],"activities")!=NULL ||
+        strstr(foregroundProcess[i],"ping")!=NULL ||
+        strstr(foregroundProcess[i],"fg")!=NULL ||
+        strstr(foregroundProcess[i],"bg")!=NULL ||
+        strstr(foregroundProcess[i],"neonate")!=NULL ||
+        strstr(foregroundProcess[i],"iMan")!=NULL)
         {
             execute_command (foregroundProcess[i],permenant_home);
         }
