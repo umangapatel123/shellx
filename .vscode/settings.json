@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "prompt.h": "c",
-        "wait.h": "c"
+        "wait.h": "c",
+        "headers.h": "c"
     }
 }

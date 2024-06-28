@@ -1,15 +1,15 @@
+exit
+seek ..
+peek ..
+ls
 warp ..
-peek -a -l
-warp -
-warp
-warp -
-exit
-seek -d mini ..
-seek -d -e min ..
-seek -e -d min ..
-seek -e -d Down ..
-seek -e -d Down ../..
-clear
-seek -e -d Downloads ../..
-cd ..
-exit
+peek ..
+peek ../..
+warp 
+iMan ls
+iMan cd
+iMan sleep
+iMan __ppc_set_ppr_med_low
+[B
+iMan ber_get_bitstring
+[A
